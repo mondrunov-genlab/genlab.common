@@ -9,7 +9,7 @@ User=alloy
 Group=alloy
 Type=simple
 Environment=HOSTNAME=%H
-ExecStart=/usr/bin/alloy run {{ alloy_config_dir }}/config.alloy \
+ExecStart=/usr/bin/alloy run {{ grafana_alloy_config_dir }}/config.alloy \
     --storage.path={{ alloy_data_dir }} \
     --server.http.listen-addr=127.0.0.1:12345 \
     --disable-reporting
