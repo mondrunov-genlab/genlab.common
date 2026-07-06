@@ -11,8 +11,8 @@
 
 - name: "Install | Create configuration and data directories"
   loop:
-    - "{{ grafana_grafana_alloy_config_dir }}"
-    - "{{ grafana_grafana_alloy_data_dir }}"
+    - "{{ grafana_alloy_config_dir }}"
+    - "{{ grafana_alloy_data_dir }}"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
