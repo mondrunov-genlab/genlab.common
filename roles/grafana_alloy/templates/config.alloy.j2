@@ -2,7 +2,7 @@
 
 local.file_match "logs" {
   path_targets = [
-{% for path in alloy_log_paths %}
+{% for path in grafana_alloy_log_paths %}
     {__path__ = "{{ path }}", job = "varlogs", host = constants.hostname},
 {% endfor %}
   ]
@@ -19,6 +19,6 @@ loki.process "default" {
 
 loki.write "default" {
   endpoint {
-    url = "{{ alloy_loki_url }}"
+    url = "{{ grafana_alloy_loki_url }}"
   }
 }
