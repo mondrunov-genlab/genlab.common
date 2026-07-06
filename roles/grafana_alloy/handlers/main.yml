@@ -1,6 +1,5 @@
 ---
 - name: "(Re)start Alloy service"
-  become: true
   ansible.builtin.systemd:
     name: alloy.service
     state: restarted
