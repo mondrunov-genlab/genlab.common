@@ -10,13 +10,13 @@ Group=alloy
 Type=simple
 Environment=HOSTNAME=%H
 ExecStart=/usr/bin/alloy run {{ grafana_alloy_config_dir }}/config.alloy \
-    --storage.path={{ alloy_data_dir }} \
+    --storage.path={{ grafana_alloy_data_dir }} \
     --server.http.listen-addr=127.0.0.1:12345 \
     --disable-reporting
 ExecReload=/bin/kill -HUP $MAINPID
 
 # Security hardening
-ReadWritePaths={{ alloy_data_dir }}
+ReadWritePaths={{ grafana_alloy_data_dir }}
 ProtectSystem=strict
 NoNewPrivileges=true
 PrivateTmp=true
