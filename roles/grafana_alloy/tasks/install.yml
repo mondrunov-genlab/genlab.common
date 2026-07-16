@@ -30,7 +30,7 @@
 
     - name: "Install | Assert version correctness"
       ansible.builtin.assert:
-        that: 
+        that:
           - "grafana_alloy_ver.rc == 0"
           - "grafana_alloy_version in grafana_alloy_ver.stdout"
         success_msg: "alloy version {{ grafana_alloy_version }} is installed and working"
