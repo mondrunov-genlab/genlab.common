@@ -59,6 +59,8 @@
       ansible.builtin.unarchive:
         src: "/tmp/alloy-linux-amd64.zip"
         dest: "/tmp"
+        group: "alloy"
+        owner: "alloy"
         remote_src: true
 
     - name: "Install | Put the binary under the PATH"
@@ -87,4 +89,4 @@
     dest: /etc/systemd/system/alloy.service
     owner: "root"
     group: "root"
-    mode: "0644"
+    mode: "0600"
