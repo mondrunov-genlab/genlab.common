@@ -46,10 +46,12 @@
       ansible.builtin.get_url:
         url: "https://github.com/grafana/alloy/releases/download/v{{ grafana_alloy_version }}/alloy-linux-amd64.zip"
         dest: "/tmp/alloy-linux-amd64.zip"
+        group: "alloy"
+        owner: "alloy"
         timeout: 30
         force: true
-      register: download_status
-      until: download_status is success
+      register: grafana_alloy_download_status
+      until: grafana_alloy_download_status is success
       retries: 3
       delay: 5
 
