@@ -48,6 +48,7 @@
         dest: "/tmp/alloy-linux-amd64.zip"
         group: "alloy"
         owner: "alloy"
+        mode: "0644"
         timeout: 30
         force: true
       register: grafana_alloy_download_status
@@ -80,7 +81,6 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
-
 
 - name: "Install | Create a systemd service unit"
   notify: "(Re)start Alloy service"
