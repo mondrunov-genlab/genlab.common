@@ -30,7 +30,7 @@
     # kics-scan ignore-block
     - name: "Check if Alloy is ready"
       ansible.builtin.uri:
-        url: "http://localhost:12345/-/ready"
+        url: "http://localhost:{{ grafana_alloy_ui_port }}/-/ready"
         return_content: true
         status_code: 200
         method: GET
