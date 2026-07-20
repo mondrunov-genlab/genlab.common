@@ -1,0 +1,97 @@
+---
+- name: "Install | Create Alloy system user"
+  ansible.builtin.user:
+    name: "alloy"
+    system: true
+    shell: "/sbin/nologin"
+    groups: "adm"
+    create_home: false
+    state: present
+
+- name: "Install | Create configuration and data directories"
+  loop:
+    - "{{ grafana_alloy_config_dir }}"
+    - "{{ grafana_alloy_data_dir }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "alloy"
+    group: "alloy"
+    mode: "0755"
+
+- name: "Install | Install the binary"
+  block:
+    - name: "Install | Check Alloy version"
+      changed_when: false
+      failed_when: false
+      ansible.builtin.command:
+        cmd: "alloy --version"
+      register: grafana_alloy_ver
+
+    - name: "Install | Assert version correctness"
+      ansible.builtin.assert:
+        that:
+          - "grafana_alloy_ver.rc == 0"
+          - "grafana_alloy_version in grafana_alloy_ver.stdout"
+        success_msg: "alloy version {{ grafana_alloy_version }} is installed and working"
+        fail_msg: "alloy version {{ grafana_alloy_version }} is not installed or not working correctly"
+
+  rescue:
+    - name: "Install | Update apt cache on Debian"
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_facts["os_family"] == "Debian"
+
+    - name: "Install | Ensure unzip is present"
+      ansible.builtin.package:
+        name: "unzip"
+        state: present
+
+    - name: "Install | Download the distribution archive"
+      ansible.builtin.get_url:
+        url: "https://github.com/grafana/alloy/releases/download/v{{ grafana_alloy_version }}/alloy-linux-amd64.zip"
+        dest: "/tmp/alloy-linux-amd64.zip"
+        group: "alloy"
+        owner: "alloy"
+        mode: "0644"
+        timeout: 30
+        force: true
+      register: grafana_alloy_download_status
+      until: grafana_alloy_download_status is success
+      retries: 3
+      delay: 5
+
+    - name: "Install | Unpack and delete the distribution"
+      ansible.builtin.unarchive:
+        src: "/tmp/alloy-linux-amd64.zip"
+        dest: "/tmp"
+        group: "alloy"
+        owner: "alloy"
+        remote_src: true
+
+    - name: "Install | Put the binary under the PATH"
+      notify: "(Re)start Alloy service"
+      ansible.builtin.copy:
+        remote_src: true
+        src: "/tmp/alloy-linux-amd64"
+        dest: "/usr/bin/alloy"
+        owner: "alloy"
+        group: "alloy"
+        mode: "0755"
+
+    - name: "Install | Clean up the downloads"
+      loop:
+        - "/tmp/alloy-linux-amd64"
+        - "/tmp/alloy-linux-amd64.zip"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+
+- name: "Install | Create a systemd service unit"
+  notify: "(Re)start Alloy service"
+  ansible.builtin.template:
+    src: alloy.service.j2
+    dest: /etc/systemd/system/alloy.service
+    owner: "root"
+    group: "root"
+    mode: "0600"
